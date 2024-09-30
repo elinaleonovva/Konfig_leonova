@@ -113,8 +113,8 @@ S = OG ZG | OG S ZG | OF ZF | OF S ZF
 # Задача 5:
 BNF_5 = '''
 P = x | y
-O = & 
-E = ( E ) | ~ P | P O E | P
+O = &
+E = ( E ) | ~ E | P O E | P | ( E O E )
 '''
 
 # Генерация для задачи 3
@@ -134,4 +134,5 @@ for i in range(10):
 
 ```
 
-![image](https://github.com/user-attachments/assets/255ed1fd-ed69-40bf-a30b-eff978424f24)
+![image](https://github.com/user-attachments/assets/4a75d2b6-56ab-4c80-9881-c814a2bc0dce)
+
