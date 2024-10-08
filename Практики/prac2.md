@@ -67,12 +67,8 @@ if __name__ == "__main__":
 
 # Задача 5
 Решить на MiniZinc задачу о зависимостях пакетов для рисунка, приведенного ниже.
-![image](https://github.com/user-attachments/assets/2702a8ee-e4c5-40b8-bba1-4bbf905718ec)
+![image_2024-10-07_17-39-41](https://github.com/user-attachments/assets/0f143a54-8f04-47af-aea3-f8a379bf3026)
 
-
-
-![image](https://github.com/user-attachments/assets/1961ca28-db34-4cb1-bb1e-b261e0945883)
-![image](https://github.com/user-attachments/assets/21342dce-ce19-4fb3-a60e-4b78bbb85c75)
 
 # Задача 6
 Решить на MiniZinc задачу о зависимостях пакетов для следующих данных.
