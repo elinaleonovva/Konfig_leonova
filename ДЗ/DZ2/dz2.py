@@ -1,5 +1,6 @@
 import requests
 import subprocess
+import argparse
 from PIL import Image
 
 
@@ -11,8 +12,7 @@ def get_package_dependencies(package_name, version):
     code = "digraph G {\n"
 
     if response.status_code != 200:
-        print(f"Ошибка: Не удалось получить информацию о пакете {package_name} версии {version}")
-        return
+        return f"Ошибка: Не удалось получить информацию о пакете {package_name} версии {version}"
 
     data = response.json()
 
@@ -20,15 +20,13 @@ def get_package_dependencies(package_name, version):
     catalog_entry_url = data.get("catalogEntry")
 
     if not catalog_entry_url:
-        print(f"Ошибка: Не удалось найти catalogEntry для {package_name} версии {version}")
-        return
+        return f"Ошибка: Не удалось найти catalogEntry для {package_name} версии {version}"
 
     # Шаг 2: Получаем данные из catalogEntry
     catalog_response = requests.get(catalog_entry_url)
 
     if catalog_response.status_code != 200:
-        print(f"Ошибка: Не удалось получить catalogEntry по адресу {catalog_entry_url}")
-        return
+        return f"Ошибка: Не удалось получить catalogEntry по адресу {catalog_entry_url}"
 
     catalog_data = catalog_response.json()
     for group in catalog_data['dependencyGroups']:
@@ -45,18 +43,34 @@ def get_package_dependencies(package_name, version):
 
 
 def main():
+    # Используем argparse для получения аргументов командной строки
+    parser = argparse.ArgumentParser(description="Визуализатор зависимостей для пакетов .NET")
+    parser.add_argument('--graphviz_path', type=str, required=True, help="Путь к программе Graphviz (dot.exe)")
+    parser.add_argument('--package_info', type=str, required=True, help="Имя пакета и версия, разделённые пробелом")
 
-    package_name = input("Введите имя пакета\n")
-    version = input("Введите версию\n")
+    args = parser.parse_args()
+
+    # Извлекаем имя пакета и версию, разделённые пробелом
+    try:
+        package_name, version = args.package_info.split(' ', 1)
+    except ValueError:
+        print("Ошибка: Пожалуйста, введите имя пакета и версию, разделённые пробелом.")
+        return
+
+    # Получаем зависимости пакета
     graph_code = get_package_dependencies(package_name, version)
+
+    if isinstance(graph_code, str) and graph_code.startswith("Ошибка"):
+        # Если возникла ошибка, выводим её и выходим
+        print(graph_code)
+        return
 
     # Сохраняем сгенерированный код в файл dependencies.dot
     with open("dependencies.dot", "w") as f:
         f.write(graph_code)
 
     # Генерируем png из .dot файла с помощью Graphviz
-    # subprocess.run(["dot", "-Tpng", "dependencies.dot", "-o", "dependencies.png"])
-    subprocess.run([r"C:\Program Files\Graphviz\bin\dot.exe", "-Tpng", "dependencies.dot", "-o", "dependencies.png"])
+    subprocess.run([args.graphviz_path, "-Tpng", "dependencies.dot", "-o", "dependencies.png"])
 
     # Открываем сгенерированное изображение
     img = Image.open("dependencies.png")
