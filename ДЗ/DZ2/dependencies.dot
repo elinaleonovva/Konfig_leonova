@@ -1,0 +1,14 @@
+digraph G {
+"Newtonsoft.Json" -> ".NETStandard1.0";
+".NETStandard1.0" -> "Microsoft.CSharp";
+".NETStandard1.0" -> "NETStandard.Library";
+".NETStandard1.0" -> "System.ComponentModel.TypeConverter";
+".NETStandard1.0" -> "System.Runtime.Serialization.Primitives";
+"Newtonsoft.Json" -> ".NETStandard1.3";
+".NETStandard1.3" -> "Microsoft.CSharp";
+".NETStandard1.3" -> "NETStandard.Library";
+".NETStandard1.3" -> "System.ComponentModel.TypeConverter";
+".NETStandard1.3" -> "System.Runtime.Serialization.Formatters";
+".NETStandard1.3" -> "System.Runtime.Serialization.Primitives";
+".NETStandard1.3" -> "System.Xml.XmlDocument";
+}
