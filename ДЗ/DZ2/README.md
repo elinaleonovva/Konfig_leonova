@@ -21,8 +21,7 @@ python dz2.py
 
 ## Примеры работы
 ![tmp0jqy6b26](https://github.com/user-attachments/assets/b601ee42-2537-4695-a02a-90a67146836c)
-![tmp0jqy6b26](https://github.com/user-attachments/assets/9f9ef956-e566-4a7f-8e9f-92f01bbf21d9)
-
+![image_2024-10-10_11-17-52](https://github.com/user-attachments/assets/53bffb41-8553-4d56-bee3-cc5cdba7ea57)
 
 ## Запуск тестов 
 ```
