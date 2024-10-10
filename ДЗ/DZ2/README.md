@@ -17,6 +17,7 @@ python dz2.py
 --graphviz_path "C:\Program Files\Graphviz\bin\dot.exe" --package_info "Microsoft.Extensions.Logging 9.0.0"
 ```
 первый аргумент - путь к программе Graphviz (пример пути указан)
+
 второй аргумент - сведения о пакете, для которого нужно получить зависимости, имя и версия записываются через пробел
 
 ## Пример работы
