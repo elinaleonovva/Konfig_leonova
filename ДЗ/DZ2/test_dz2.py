@@ -9,7 +9,6 @@ from dz2 import get_package_dependencies, main
 # Тестирование функции get_package_dependencies
 @patch('requests.get')
 def test_get_package_dependencies_success(mock_get):
-    # Мокаем ответ для запроса к URL
     mock_get.return_value.status_code = 200
     mock_get.return_value.json.side_effect = [
         {"catalogEntry": "https://example.com/catalog"},
@@ -34,6 +33,7 @@ def test_get_package_dependencies_success(mock_get):
     assert result == expected_output
 
 
+# Имитация случая, когда API возвращает пустой ответ
 @patch('requests.get')
 def test_get_package_dependencies_no_catalog_entry(mock_get):
     mock_get.return_value.status_code = 200
@@ -43,6 +43,7 @@ def test_get_package_dependencies_no_catalog_entry(mock_get):
     assert result == "Ошибка: Не удалось найти catalogEntry для test_package версии 1.0.0"
 
 
+# Проверка на возникновение HTTP-ошибки (404)
 @patch('requests.get')
 def test_get_package_dependencies_http_error(mock_get):
     mock_get.return_value.status_code = 404
@@ -58,7 +59,6 @@ def test_get_package_dependencies_http_error(mock_get):
 @patch('PIL.Image.open')
 @patch('dz2.get_package_dependencies')
 def test_main_success(mock_get_deps, mock_image_open, mock_open_file, mock_subprocess_run, mock_parse_args):
-    # Мокаем аргументы командной строки
     mock_parse_args.return_value.graphviz_path = '/path/to/dot'
     mock_parse_args.return_value.package_info = 'Microsoft.Extensions.Logging 9.0.0'
 
@@ -67,7 +67,6 @@ def test_main_success(mock_get_deps, mock_image_open, mock_open_file, mock_subpr
 ".NETFramework4.6.2" -> "Dependency1";
 }'''
 
-    # Вызываем main
     main()
 
     # Проверяем, что файл .dot был записан
@@ -81,6 +80,7 @@ def test_main_success(mock_get_deps, mock_image_open, mock_open_file, mock_subpr
     mock_image_open.assert_called_once_with('dependencies.png')
 
 
+# Обработка неверного формата аргументов командной строки
 @patch('argparse.ArgumentParser.parse_args')
 def test_main_package_info_error(mock_parse_args):
     mock_parse_args.return_value.graphviz_path = '/path/to/dot'

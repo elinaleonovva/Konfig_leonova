@@ -5,7 +5,12 @@ from PIL import Image
 
 
 def get_package_dependencies(package_name, version):
-    # Шаг 1: Получаем ссылку на каталог (catalogEntry)
+    '''
+    Получение зависимостей пакета .NET из API NuGet
+    Создание графа зависимостей в формате, который понимает Graphviz
+    '''
+
+    # Ссылка на каталог
     url = f"https://api.nuget.org/v3/registration5-gz-semver2/{package_name.lower()}/{version}.json"
     response = requests.get(url)
     dependencies = set()
@@ -43,14 +48,12 @@ def get_package_dependencies(package_name, version):
 
 
 def main():
-    # Используем argparse для получения аргументов командной строки
     parser = argparse.ArgumentParser(description="Визуализатор зависимостей для пакетов .NET")
     parser.add_argument('--graphviz_path', type=str, required=True, help="Путь к программе Graphviz (dot.exe)")
     parser.add_argument('--package_info', type=str, required=True, help="Имя пакета и версия, разделённые пробелом")
 
     args = parser.parse_args()
 
-    # Извлекаем имя пакета и версию, разделённые пробелом
     try:
         package_name, version = args.package_info.split(' ', 1)
     except ValueError:
@@ -61,7 +64,6 @@ def main():
     graph_code = get_package_dependencies(package_name, version)
 
     if isinstance(graph_code, str) and graph_code.startswith("Ошибка"):
-        # Если возникла ошибка, выводим её и выходим
         print(graph_code)
         return
 
@@ -72,7 +74,6 @@ def main():
     # Генерируем png из .dot файла с помощью Graphviz
     subprocess.run([args.graphviz_path, "-Tpng", "dependencies.dot", "-o", "dependencies.png"])
 
-    # Открываем сгенерированное изображение
     img = Image.open("dependencies.png")
     img.show()
 
