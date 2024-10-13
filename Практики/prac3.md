@@ -14,9 +14,9 @@ local group_temp = "ИКБО-%g-%g";
   ],
 
   students: [
-    student(19, group_temp % [4, 20], "Иванов И.И."),
-    student(18, group_temp % [5, 20], "Петров П.П."),
-    student(18, group_temp % [5, 20], "Сидоров С.С."),
+    student(19, group_temp % [4, 20], "Маркаданов А.А."),
+    student(18, group_temp % [5, 20], "Землянская М.М."),
+    student(18, group_temp % [5, 20], "Барташевский Д.Д."),
     student(19, group_temp % [20, 22], "Леонова Э.Р."),
   ],
   subject: "Конфигурационное управление",
@@ -55,10 +55,10 @@ let student : Student = { age, group, name }
 in student
 
 let students : List Student = [ 
-	makeStudent 19 (groupTemp 4 20) "Иванов И.И.",
-	makeStudent 18 (groupTemp 5 20) "Петров П.П.",
+	makeStudent 19 (groupTemp 4 20) "Леонова Э.Р.",
+	makeStudent 18 (groupTemp 5 20) "Барташевский Д.Д.",
 	makeStudent 18 (groupTemp 5 20) "Сидоров С.С.",
-	makeStudent 19 (groupTemp 20 22) "Леонова Э.Р."
+	makeStudent 19 (groupTemp 20 22) "Петров С.Р."
 ]
 
 let subject = "Конфигурационное управление"
