@@ -23,53 +23,57 @@ local group_temp = "ИКБО-%g-%g";
 }
 ```
 
+![image](https://github.com/user-attachments/assets/1db4721f-c04d-43da-b2dc-56b5e730acc4)
+![image](https://github.com/user-attachments/assets/e1a71156-86a6-4655-b62a-a736964db071)
+![image](https://github.com/user-attachments/assets/843d4d89-554a-4902-a0b8-36e7078967aa)
+
+
 # Задача 2
 Реализовать на Dhall приведенный ниже пример в формате JSON. Использовать в реализации свойство программируемости и принцип DRY.
 ```
 let generate = https://prelude.dhall-lang.org/List/generate
 
 let Student : Type = { 
-	age : Natural,
-	group : Text,
-	name : Text
+  age : Natural,
+  group : Text,
+  name : Text
 }
 
 let groupTemp : Natural -> Natural -> Text =
-	\(num : Natural) ->
-	\(year : Natural) ->
-	"ИКБО-${Natural/show num}-${Natural/show year}"
+  \(num : Natural) ->
+  \(year : Natural) ->
+  "ИКБО-${Natural/show num}-${Natural/show year}"
 
 let anotherGroupTemp : Natural -> Text =
-	\(num : Natural) ->
-	"ИКБО-${Natural/show (num + 1)}-2
+  \(num : Natural) ->
+  "ИКБО-${Natural/show (num + 1)}-20"  
+
 let makeStudent : Natural -> Text -> Text -> Student =
-	\(age : Natural) ->
-	\(group : Text) ->
-	\(name : Text) ->
+  \(age : Natural) ->
+  \(group : Text) ->
+  \(name : Text) ->
+  { age = age, group = group, name = name }
 
-let age : Natural = age
-let group : Text = group
-let name : Text = name
-let student : Student = { age, group, name }
-
-in student
-
-let students : List Student = [ 
-	makeStudent 19 (groupTemp 4 20) "Леонова Э.Р.",
-	makeStudent 18 (groupTemp 5 20) "Барташевский Д.Д.",
-	makeStudent 18 (groupTemp 5 20) "Сидоров С.С.",
-	makeStudent 19 (groupTemp 20 22) "Петров С.Р."
-]
+let students : List Student = 
+  [ makeStudent 19 (groupTemp 4 20) "Иванов И"
+  , makeStudent 18 (groupTemp 5 20) "Петров П.П."
+  , makeStudent 18 (groupTemp 5 20) "Леонова Э.Р."
+  , makeStudent 19 (groupTemp 20 22) "Барташевский Д.Д."
+  ]
 
 let subject = "Конфигурационное управление"
-let out = < groups : List Text | students : List Student | subject : Text>
+
+let out = { groups : List Text, students : List Student, subject : Text }
 
 in { 
-	subject,
-	students,
-	groups = generate 23 Text anotherGroupTemp
+  subject = subject,
+  students = students,
+  groups = generate 24 Text anotherGroupTemp  
 }
 ```
+
+![image](https://github.com/user-attachments/assets/0739c25a-4955-4d6b-9d7c-6885b7ba1b3b)
+
 
 # Задача 3-5
 Реализовать грамматики, описывающие следующие языки (для каждого решения привести БНФ). Код решения должен содержаться в переменной BNF
@@ -136,5 +140,3 @@ for i in range(10):
 
 ![image](https://github.com/user-attachments/assets/b9404cec-65c3-40cd-aabe-8906cdda92eb)
 ![image](https://github.com/user-attachments/assets/8df3a334-3049-43d5-8938-2ae3a898b931)
-
-
