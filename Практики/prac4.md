@@ -64,8 +64,7 @@ if __name__ == "__main__":
     main()
 ```
 
-![image](https://github.com/user-attachments/assets/7923474a-6e67-43e0-93f5-41db22d3cc3d)
-
+![Без имени](https://github.com/user-attachments/assets/7d746e29-bb9c-4590-bc84-7f595dad2e46)
 
 # Задача 3
 Добавить цель clean, не забыв и про "животное".
