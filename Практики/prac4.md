@@ -113,4 +113,18 @@ gcc prog.c data.c -o prog
 dir /B > files.lst
 7z a distr.zip *.*
 ```Вместо gcc можно использовать другой компилятор командной строки, но на вход ему должны подаваться два модуля: prog и data. Если используете не Windows, то исправьте вызовы команд на их эквиваленты из вашей ОС. В makefile должны быть, как минимум, следующие задачи: all, clean, archive. Обязательно покажите на примере, что уже сделанные подзадачи у вас не перестраиваются.
+```
+all: prog files.lst distr.zip
+
+prog: prog.c data.c
+    gcc prog.c data.c -o prog
+
+files.lst: 
+    dir /B > files.lst
+
+distr.zip: *
+    7z a distr.zip $^
+clean:
+    rm -f prog files.lst distr.zip
+```
 
