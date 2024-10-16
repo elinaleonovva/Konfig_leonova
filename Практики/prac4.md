@@ -104,7 +104,7 @@ def main():
 if __name__ == "__main__":
     main()
 ```
-![image](https://github.com/user-attachments/assets/1b3ae57e-944e-4a1a-83df-9adccc71de13)
+![Без имени](https://github.com/user-attachments/assets/043039ac-3628-424d-88d4-035621e2cc5d)
 
 # Задача 4
 Написать makefile для следующего скрипта сборки:
