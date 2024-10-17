@@ -1,0 +1,16 @@
+# Конфигурация веб-сервера
+server_name: "example.com"
+port: 80
+root: "/var/www/html"
+
+let:
+  name: "max_connections"
+  value: "100"
+
+config:
+  timeout: $max_connections$
+  directory_index: "index.html"
+
+files:
+  - "config/nginx.conf"
+  - "config/default.conf"

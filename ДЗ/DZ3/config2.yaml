@@ -1,0 +1,18 @@
+# Конфигурация базы данных
+database_name: "test_db"
+user: "admin"
+password: "secret_password"
+
+let:
+  name: "max_rows"
+  value: "5000"
+
+settings:
+  pool_size: 10
+  max_rows_per_table: $max_rows$
+  charset: "utf8"
+
+tables:
+  - "users"
+  - "orders"
+  - "products"
