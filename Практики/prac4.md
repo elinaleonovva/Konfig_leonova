@@ -118,16 +118,23 @@ dir /B > files.lst
 Решение
 
 ```
-all: prog files.lst distr.zip
+CC = gcc
+CFLAGS = -Wall
+TARGET = prog
 
-prog: prog.c data.c
-    gcc prog.c data.c -o prog
+all: $(TARGET) files.lst distr.zip
+
+$(TARGET): prog.c data.c
+	$(CC) $(CFLAGS) prog.c data.c -o $(TARGET)
 
 files.lst: 
-    dir /B > files.lst
+	dir /B > files.lst   # Для Windows
+	# ls > files.lst      # Для Unix/Linux
 
-distr.zip: *
-    7z a distr.zip $^
+distr.zip: $(TARGET) files.lst
+	7z a distr.zip $(TARGET) files.lst *.*
+
 clean:
-    rm -f prog files.lst distr.zip
+	rm -f $(TARGET) files.lst distr.zip
+
 ```
