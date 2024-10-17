@@ -42,8 +42,10 @@ def print_all_dependences(x, graph, added, makefile):
         # Генерация правила для каждой задачи с проверкой файла-флага
         makefile.write(f"{x}: .{x}_done\n")
         makefile.write(f".{x}_done:\n")
-        makefile.write(f"\t@echo \"{x} done.\"\n")
-        makefile.write(f"\ttouch .{x}_done\n")
+        makefile.write(f"\t@if [ ! -f .{x}_done ]; then \\\n")
+        makefile.write(f"\t\techo \"{x} done.\"; \\\n")
+        makefile.write(f"\t\ttouch .{x}_done; \\\n")
+        makefile.write(f"\tfi\n")
     added.add(x)
 
 def main():
@@ -51,20 +53,18 @@ def main():
     last = input("Enter the last target: ")
 
     with open("Makefile", "w") as makefile:
-        makefile.write(f"{last}: ")
-        for dep in graph[last]:
-            makefile.write(f"{dep} ")
-        makefile.write("\n\t@echo \"{last} done.\"\n")
-
         added = set()
         print_all_dependences(last, graph, added, makefile)
-
+        makefile.write(f"{last}: {' '.join(graph[last])}\n")
+        makefile.write(f"\t@echo \"{last} done.\"\n")
 
 if __name__ == "__main__":
     main()
 ```
 
-![Без имени](https://github.com/user-attachments/assets/7d746e29-bb9c-4590-bc84-7f595dad2e46)
+![image](https://github.com/user-attachments/assets/671141e2-9756-4f10-8473-c2d6b7b0a713)
+![image](https://github.com/user-attachments/assets/835f9d62-37fc-43ae-ab69-f39a41a196fb)
+
 
 # Задача 3
 Добавить цель clean, не забыв и про "животное".
