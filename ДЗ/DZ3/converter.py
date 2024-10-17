@@ -1,6 +1,15 @@
 import yaml
 import re
-import argparse
+
+def convert_comments(line):
+    """
+    Преобразует комментарии из формата YAML (#) в конфигурационный формат (||).
+    """
+    comment_match = re.match(r'\s*#(.*)', line)
+    if comment_match:
+        comment = comment_match.group(1).strip()
+        return f"|| {comment}"
+    return None
 
 def is_number(value):
     """Проверка, является ли строка числом."""
@@ -54,7 +63,7 @@ def process_yaml(yaml_data):
     # Обработка ключей и значений
     for key, value in yaml_data.items():
         if isinstance(value, str):
-            if value.startswith("||"):
+            if value.startswith("#"):
                 continue  # Пропускаем однострочные комментарии
             result.append(f'{sanitize_name(key)} = {convert_value(value, constants)};')
         elif isinstance(value, (int, float)):
@@ -82,6 +91,8 @@ def main(yaml_file):
 
 
 if __name__ == "__main__":
+    import argparse
+
     parser = argparse.ArgumentParser(description="YAML to custom config converter")
     parser.add_argument('-f', '--file', type=str, required=True, help="YAML file to process")
     args = parser.parse_args()
