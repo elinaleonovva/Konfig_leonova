@@ -1,7 +1,8 @@
 # Настройки базы данных
-db_host: "localhost
+db_host: "localhost"
 db_port: "5432"
 db_name: "my_database"
+db_password: "my_database"
 
 let:
   name: "max_rows"
@@ -10,7 +11,6 @@ let:
 max_rows_per_table: $max_rows$
 
 tables:
-  - "12"
+  - "users"
   - "orders"
   - "products"
-  - $max_rows$
