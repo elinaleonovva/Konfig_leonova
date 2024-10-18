@@ -1,7 +1,7 @@
 # Настройки базы данных
-database_name: "test_db"
-user: "admin"
-password: "secret_password"
+db_host: "localhost
+db_port: "5432"
+db_name: "my_database"
 
 let:
   name: "max_rows"
