@@ -1,5 +1,5 @@
 # Конфигурация веб-сервера
-server_name: "example.com"
+server_name: "Example.com"
 port: "80"
 root: "/var/www/html"
 

@@ -1,11 +1,12 @@
 import yaml
 import re
+import argparse
 
 def convert_comments_in_line(line):
     """
     Преобразует комментарии в строке YAML (#) в конфигурационный формат (||).
     """
-    comment_split = line.split('#', 1)  # Разделение строки на основное содержимое и комментарий
+    comment_split = line.split('#', 1)
     if len(comment_split) > 1:
         comment = comment_split[1].strip()
         line_without_comment = comment_split[0].strip()
@@ -14,7 +15,9 @@ def convert_comments_in_line(line):
 
 
 def is_number(value):
-    """Проверка, является ли строка числом."""
+    """
+    Проверка, является ли строка числом.
+    """
     try:
         float(value)
         return True
@@ -23,20 +26,15 @@ def is_number(value):
 
 
 def sanitize_name(name):
-    """Очистка имени переменной или ключа от недопустимых символов."""
+    """
+    Очистка имени переменной или ключа от недопустимых символов.
+    """
     return re.sub(r'\W|^(?=\d)', '_', name)
 
 
 def convert_value(value, constants):
     """
     Преобразует значение в конфигурацию, включая подстановку констант.
-
-    Параметры:
-        value (str): Значение для преобразования.
-        constants (dict): Словарь констант.
-
-    Возвращает:
-        str: Преобразованное значение.
     """
     value = value.strip()
 
@@ -52,30 +50,24 @@ def convert_value(value, constants):
 def process_yaml(yaml_data):
     """
     Обрабатывает YAML-данные и конвертирует их в конфигурационный формат.
-
-    Параметры:
-        yaml_data (dict): Данные из YAML.
-
-    Возвращает:
-        str: Преобразованная конфигурация.
     """
     result = []
     constants = {}
 
     for key, value in yaml_data.items():
         if isinstance(value, str):
-            result.append(f'{sanitize_name(key)} = {convert_value(value, constants)};')
+            result.append(f'{sanitize_name(key)} = {convert_value(value, constants)}')
         elif isinstance(value, (int, float)):
-            result.append(f'{sanitize_name(key)} = {value};')
+            result.append(f'{sanitize_name(key)} = {value}')
         elif isinstance(value, dict) and 'value' in value and 'name' in value:
             # Обработка объявления констант
             name = sanitize_name(value['name'])
             constants[name] = value['value']
-            result.append(f'let {name} = {convert_value(value["value"], constants)};')
+            result.append(f'let {name} = {convert_value(value["value"], constants)}')
         elif isinstance(value, list):
             # Обработка массивов
             array_values = ', '.join(convert_value(str(item), constants) for item in value)
-            result.append(f'{sanitize_name(key)} = list({array_values});')
+            result.append(f'{sanitize_name(key)} = list({array_values})')
 
     return "\n".join(result)
 
@@ -83,12 +75,6 @@ def process_yaml(yaml_data):
 def process_yaml_with_comments(yaml_file):
     """
     Обрабатывает YAML-файл и конвертирует его в конфигурацию с комментариями.
-
-    Параметры:
-        yaml_file (str): Путь к YAML-файлу.
-
-    Возвращает:
-        str: Преобразованная конфигурация.
     """
     result = []
     constants = {}
@@ -107,13 +93,12 @@ def process_yaml_with_comments(yaml_file):
             if comment:
                 result.append(comment)
 
-        # Парсинг YAML с обработкой синтаксических ошибок
+        # Обработка синтаксических ошибок
         try:
             yaml_data = yaml.safe_load("\n".join(yaml_lines))
         except yaml.YAMLError as exc:
             raise SyntaxError(f"Ошибка синтаксиса в YAML: {exc}")
 
-    # Преобразование данных
     config_output = process_yaml(yaml_data)
     result.append(config_output)
 
@@ -121,7 +106,6 @@ def process_yaml_with_comments(yaml_file):
 
 
 def main(yaml_file):
-    """Главная функция для загрузки YAML-файла и его обработки."""
     try:
         config_output = process_yaml_with_comments(yaml_file)
         print(config_output)
@@ -132,10 +116,8 @@ def main(yaml_file):
 
 
 if __name__ == "__main__":
-    import argparse
-
     parser = argparse.ArgumentParser(description="YAML to custom config converter")
-    parser.add_argument('-f', '--file', type=str, required=True, help="YAML file to process")
+    parser.add_argument('file', type=str, help="YAML file to process")
     args = parser.parse_args()
 
     main(args.file)

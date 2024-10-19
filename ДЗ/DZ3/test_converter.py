@@ -50,10 +50,10 @@ def test_process_yaml():
         "constant": {"name": "CONST", "value": "constant_value"}
     }
     expected_output = (
-        'key1 = "value1";\n'
-        'key2 = 123;\n'
-        'let CONST = "constant_value";\n'
-        'array = list(1, 2, 3);'
+        'key1 = "value1"\n'
+        'key2 = 123\n'
+        'let CONST = "constant_value"\n'
+        'array = list(1, 2, 3)'
     )
 
     actual_output = process_yaml(yaml_data)
@@ -82,10 +82,10 @@ def test_process_yaml_with_comments(tmp_path):
 
     expected_output = (
         '|| Comment\n'
-        'key1 = "value1";\n'
-        'key2 = 123;\n'
-        'array = list(1, 2, 3);\n'
-        'let CONST = "constant_value";'
+        'key1 = "value1"\n'
+        'key2 = 123\n'
+        'array = list(1, 2, 3)\n'
+        'let CONST = "constant_value"'
     )
 
     actual_output = process_yaml_with_comments(str(yaml_file))
