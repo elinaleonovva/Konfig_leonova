@@ -82,7 +82,6 @@ tables:
   - "users"
   - "orders"
   - "products"
-
 ```
 
 #### Конвертированный вывод:
@@ -95,7 +94,6 @@ db_password = "my_database"
 let max_rows = 5000
 max_rows_per_table = 5000
 tables = list("users", "orders", "products")
-
 ```
 
 ## Запуск тестов 
