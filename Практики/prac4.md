@@ -26,9 +26,8 @@ if __name__ == "__main__":
     main()
 ```
 
-![image](https://github.com/user-attachments/assets/6b91fc88-7d55-457d-948f-89ccb793e63a)
-![image](https://github.com/user-attachments/assets/1269f3c3-1735-4436-bac7-6b3acda6fd94)
-![image](https://github.com/user-attachments/assets/b55087f6-0e27-46ef-b7e8-4192d92669c7)
+![image](https://github.com/user-attachments/assets/c63cfa47-0167-4911-ba09-5ea4c4003ab5)
+
 
 # Задача 2
 Реализовать вариант трансляции, при котором повторный запуск make не выводит для civgraph на экран уже выполненные "задачи".
