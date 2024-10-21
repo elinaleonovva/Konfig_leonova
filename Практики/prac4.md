@@ -35,16 +35,16 @@ if __name__ == "__main__":
 import json
 import os
 
-def get_all_depends(graph, targetTech):
+def get_dependencies(graph, targetTech):
     depends = set(graph[targetTech])
     for depend in graph[targetTech]:
-        for i in get_all_depends(graph, depend):
+        for i in get_dependencies(graph, depend):
             depends.add(i)
     return depends
 
 def generate_makefile(graph, targetTech):
     tasks = load_tasks()
-    depends = get_all_depends(graph, targetTech)
+    depends = get_dependencies(graph, targetTech)
     tasks.add(targetTech)
     with open('Makefile', 'w') as f:
         result_string = ""
@@ -56,7 +56,7 @@ def generate_makefile(graph, targetTech):
             f.write(f'{target}:\n')
             f.write(result_string)
     save_tasks(tasks)
-    
+
 def load_tasks():
     if os.path.exists("task_done.txt"):
         with open("task_done.txt", 'r') as f:
