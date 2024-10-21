@@ -151,6 +151,6 @@ archive: $(EXEC)
 clean:
 	rm -f $(EXEC) files.lst $(ARCHIVE)
 ```
+![image](https://github.com/user-attachments/assets/8c22421d-9634-4ecb-b37d-3f69ba11e8b1)
 ![image](https://github.com/user-attachments/assets/9dbf7205-088d-4218-8204-db2b5476b723)
 ![image](https://github.com/user-attachments/assets/9eba6ebd-779b-4226-b107-6d67f24ec4d2)
-
