@@ -36,11 +36,27 @@ import json
 import os
 
 def get_all_depends(graph, targetTech):
-    depends = set(graph.get(targetTech, []))
-    for depend in graph.get(targetTech, []):
-        depends.update(get_all_depends(graph, depend))
+    depends = set(graph[targetTech])
+    for depend in graph[targetTech]:
+        for i in get_all_depends(graph, depend):
+            depends.add(i)
     return depends
 
+def generate_makefile(graph, targetTech):
+    tasks = load_tasks()
+    depends = get_all_depends(graph, targetTech)
+    tasks.add(targetTech)
+    with open('Makefile', 'w') as f:
+        result_string = ""
+        for target in depends:
+            if target not in tasks:
+                tasks.add(target)
+                result_string += f'\t@echo "{target} done"\n'
+        if result_string != "":
+            f.write(f'{target}:\n')
+            f.write(result_string)
+    save_tasks(tasks)
+    
 def load_tasks():
     if os.path.exists("task_done.txt"):
         with open("task_done.txt", 'r') as f:
@@ -55,19 +71,10 @@ if __name__ == '__main__':
     with open('civgraph.json') as file:
         graph = json.load(file)
     target = input('Enter target: ')
-    
-    dependencies = get_all_depends(graph, target)
-    print("Dependencies:", dependencies)
-
-    tasks = load_tasks()
-    tasks.add(target)
-
-    save_tasks(tasks)
-
+    generate_makefile(graph, target)
 ```
 
 ![image](https://github.com/user-attachments/assets/e05a6fe2-6171-4cda-881d-2f2ba25a0131)
-
 
 
 # Задача 3
@@ -140,5 +147,4 @@ distr.zip: $(TARGET) files.lst
 
 clean:
 	rm -f $(TARGET) files.lst distr.zip
-
 ```
