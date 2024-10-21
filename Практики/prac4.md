@@ -61,8 +61,7 @@ if __name__ == "__main__":
     main()
 ```
 
-![image](https://github.com/user-attachments/assets/671141e2-9756-4f10-8473-c2d6b7b0a713)
-![image](https://github.com/user-attachments/assets/835f9d62-37fc-43ae-ab69-f39a41a196fb)
+![image](https://github.com/user-attachments/assets/a659b943-19f4-426e-8f5d-31f006d852f2)
 
 
 # Задача 3
