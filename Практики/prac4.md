@@ -33,35 +33,41 @@ if __name__ == "__main__":
 Реализовать вариант трансляции, при котором повторный запуск make не выводит для civgraph на экран уже выполненные "задачи".
 ```
 import json
+import os
 
-def print_all_dependences(x, graph, added, makefile):
-    for i in graph[x]:
-        print_all_dependences(i, graph, added, makefile)
-    if x not in added:
-        # Генерация правила для каждой задачи с проверкой файла-флага
-        makefile.write(f"{x}: .{x}_done\n")
-        makefile.write(f".{x}_done:\n")
-        makefile.write(f"\t@if [ ! -f .{x}_done ]; then \\\n")
-        makefile.write(f"\t\techo \"{x} done.\"; \\\n")
-        makefile.write(f"\t\ttouch .{x}_done; \\\n")
-        makefile.write(f"\tfi\n")
-    added.add(x)
+def get_all_depends(graph, targetTech):
+    depends = set(graph.get(targetTech, []))
+    for depend in graph.get(targetTech, []):
+        depends.update(get_all_depends(graph, depend))
+    return depends
 
-def main():
-    graph = json.loads(open("civgraph.json").read())
-    last = input("Enter the last target: ")
+def load_tasks():
+    if os.path.exists("task_done.txt"):
+        with open("task_done.txt", 'r') as f:
+            return set(f.read().splitlines())
+    return set()
 
-    with open("Makefile", "w") as makefile:
-        added = set()
-        print_all_dependences(last, graph, added, makefile)
-        makefile.write(f"{last}: {' '.join(graph[last])}\n")
-        makefile.write(f"\t@echo \"{last} done.\"\n")
+def save_tasks(tasks):
+    with open("task_done.txt", 'w') as f:
+        f.write('\n'.join(tasks))
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    with open('civgraph.json') as file:
+        graph = json.load(file)
+    target = input('Enter target: ')
+    
+    dependencies = get_all_depends(graph, target)
+    print("Dependencies:", dependencies)
+
+    tasks = load_tasks()
+    tasks.add(target)
+
+    save_tasks(tasks)
+
 ```
 
-![image](https://github.com/user-attachments/assets/a659b943-19f4-426e-8f5d-31f006d852f2)
+![image](https://github.com/user-attachments/assets/e05a6fe2-6171-4cda-881d-2f2ba25a0131)
+
 
 
 # Задача 3
