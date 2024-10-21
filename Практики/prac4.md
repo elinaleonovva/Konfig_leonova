@@ -126,22 +126,31 @@ dir /B > files.lst
 Решение
 
 ```
-CC = gcc
-CFLAGS = -Wall
-TARGET = prog
+CC = gcc 
+SRC = prog.c data.c  
+EXEC = prog  
+ARCHIVE = distr.zip 
 
-all: $(TARGET) files.lst distr.zip
+ifeq ($(OS),Windows_NT)
+    LIST_CMD = dir /B > files.lst  # Команда для создания списка файлов в Windows
+else
+    LIST_CMD = ls > files.lst  # Команда для создания списка файлов в Linux/macOS
+endif
 
-$(TARGET): prog.c data.c
-	$(CC) $(CFLAGS) prog.c data.c -o $(TARGET)
+.PHONY: all clean archive
 
-files.lst: 
-	dir /B > files.lst   # Для Windows
-	# ls > files.lst      # Для Unix/Linux
+all: $(EXEC)
 
-distr.zip: $(TARGET) files.lst
-	7z a distr.zip $(TARGET) files.lst *.*
+$(EXEC): $(SRC)
+	$(CC) $(SRC) -o $(EXEC)
+
+archive: $(EXEC)
+	$(LIST_CMD) 
+	7z a $(ARCHIVE) *.* 
 
 clean:
-	rm -f $(TARGET) files.lst distr.zip
+	rm -f $(EXEC) files.lst $(ARCHIVE)
 ```
+![image](https://github.com/user-attachments/assets/9dbf7205-088d-4218-8204-db2b5476b723)
+![image](https://github.com/user-attachments/assets/9eba6ebd-779b-4226-b107-6d67f24ec4d2)
+
