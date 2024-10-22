@@ -87,11 +87,9 @@ def read_tasks():
             tasks = file.read().splitlines()
     return set(tasks)
 
-
 def write_tasks(tasks):
     with open("task_done.txt", 'w') as file:
         file.write('\n'.join(sorted(tasks)))
-
 
 def clear_tasks():
     if os.path.isfile("task_done.txt"):
@@ -99,7 +97,6 @@ def clear_tasks():
         print("Cleaned completed tasks.")
     else:
         print("No tasks to clean.")
-
 
 def read_civgraph():
     try:
@@ -109,12 +106,10 @@ def read_civgraph():
         print(f"File civgraph.json not found.")
         return {}
 
-
 def process_dependencies(graph, start_node):
     seen = set()
     ordered_tasks = []
     done_tasks = read_tasks()
-
     def traverse(node):
         if node not in seen and node not in done_tasks:
             seen.add(node)
@@ -122,16 +117,12 @@ def process_dependencies(graph, start_node):
             for dep in dependencies:
                 traverse(dep)
             ordered_tasks.append(node)
-
     traverse(start_node)
-
     for task in ordered_tasks:
         if task not in done_tasks:
             print(task)
             done_tasks.add(task)
-
     write_tasks(done_tasks)
-
 
 if __name__ == '__main__':
     graph = read_civgraph()
