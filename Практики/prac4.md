@@ -128,8 +128,7 @@ if __name__ == '__main__':
         update_makefile(dependency_graph, target_input)
 
 ```
-![image](https://github.com/user-attachments/assets/00f86098-0c08-432f-8df6-1cf73c132cd9)
-![image](https://github.com/user-attachments/assets/749986a8-4b1c-4bf1-b2b8-a89321d752a9)
+![image](https://github.com/user-attachments/assets/46100c55-b390-4c57-a815-b68e520b4ca3)
 
 
 # Задача 4
