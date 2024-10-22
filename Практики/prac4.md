@@ -67,7 +67,7 @@ def write_completed_tasks(tasks):
 if __name__ == '__main__':
     with open('civgraph.json') as json_file:
         dependency_graph = json.load(json_file)
-    target_input = input('Введите цель: ')
+    target_input = input('Enter target: ')
     update_makefile(dependency_graph, target_input)
 ```
 
@@ -80,64 +80,53 @@ if __name__ == '__main__':
 import json
 import os
 
-def read_tasks():
-    tasks = []
-    if os.path.isfile("task_done.txt"):
+def get_dependencies(graph, target_technology):
+    dependencies = set(graph.get(target_technology, []))
+    for dependency in graph.get(target_technology, []):
+        dependencies.update(get_dependencies(graph, dependency))
+    return dependencies
+
+def update_makefile(graph, target_technology):
+    completed_tasks = read_completed_tasks()
+    dependencies = get_dependencies(graph, target_technology)
+    completed_tasks.add(target_technology)
+    
+    with open('Makefile', 'a') as makefile:
+        for dependency in dependencies:
+            if dependency not in completed_tasks:
+                completed_tasks.add(dependency)
+                makefile.write(f'\t@echo "{dependency} done"\n')
+
+    write_completed_tasks(completed_tasks)
+
+def read_completed_tasks():
+    if os.path.exists("task_done.txt"):
         with open("task_done.txt", 'r') as file:
-            tasks = file.read().splitlines()
-    return set(tasks)
+            return set(file.read().splitlines())
+    return set()
 
-def write_tasks(tasks):
+def write_completed_tasks(tasks):
     with open("task_done.txt", 'w') as file:
-        file.write('\n'.join(sorted(tasks)))
+        file.write('\n'.join(tasks))
 
-def clear_tasks():
-    if os.path.isfile("task_done.txt"):
+def clean():
+    if os.path.exists("task_done.txt"):
         os.remove("task_done.txt")
         print("Cleaned completed tasks.")
     else:
         print("No tasks to clean.")
 
-def read_civgraph():
-    try:
-        with open("civgraph.json", 'r') as file:
-            return json.load(file)
-    except FileNotFoundError:
-        print(f"File civgraph.json not found.")
-        return {}
-
-def process_dependencies(graph, start_node):
-    seen = set()
-    ordered_tasks = []
-    done_tasks = read_tasks()
-    def traverse(node):
-        if node not in seen and node not in done_tasks:
-            seen.add(node)
-            dependencies = graph.get(node, [])
-            for dep in dependencies:
-                traverse(dep)
-            ordered_tasks.append(node)
-    traverse(start_node)
-    for task in ordered_tasks:
-        if task not in done_tasks:
-            print(task)
-            done_tasks.add(task)
-    write_tasks(done_tasks)
-
 if __name__ == '__main__':
-    graph = read_civgraph()
-    user_action = input("Enter action: ").strip().lower()
+    action = input("Enter action: ").strip().lower()
 
-    if user_action == 'clean':
-        clear_tasks()
-    elif user_action == 'make':
-        target = input("Enter the target technology: ").strip()
-        if target in graph:
-            process_dependencies(graph, target)
-        else:
-            print(f"Target '{target}' not found in the graph.")
+    if action == 'clean':
+        clean()
     else:
-        print("Invalid action. Please enter 'make' or 'clean'.")
+        with open('civgraph.json') as json_file:
+            dependency_graph = json.load(json_file)
+        target_input = input('Enter target: ')
+        update_makefile(dependency_graph, target_input)
+
 ```
 ![image](https://github.com/user-attachments/assets/00f86098-0c08-432f-8df6-1cf73c132cd9)
 ![image](https://github.com/user-attachments/assets/749986a8-4b1c-4bf1-b2b8-a89321d752a9)
