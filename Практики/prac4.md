@@ -124,7 +124,7 @@ if __name__ == '__main__':
     else:
         with open('civgraph.json') as json_file:
             dependency_graph = json.load(json_file)
-        target_input = input('Enter target: ')
+        target_input = input('Enter the target technology: ')
         update_makefile(dependency_graph, target_input)
 
 ```
