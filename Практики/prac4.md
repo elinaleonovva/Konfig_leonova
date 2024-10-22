@@ -78,41 +78,79 @@ if __name__ == '__main__':
 Добавить цель clean, не забыв и про "животное".
 ```
 import json
+import os
 
-def print_all_dependences(x, graph, added, makefile):
-    for i in graph[x]:
-        print_all_dependences(i, graph, added, makefile)
-    if x not in added:
-        # Генерация правила для каждой задачи без точки в имени файла-флага
-        makefile.write(f"{x}: {x}_done\n")
-        makefile.write(f"{x}_done:\n")
-        makefile.write(f"\t@echo \"{x} done.\"\n")
-        makefile.write(f"\ttouch {x}_done\n") 
-    added.add(x)
-
-def main():
-    graph = json.loads(open("civgraph.json").read())
-    last = input("Enter the last target: ")
-
-    with open("Makefile", "w") as makefile:
-        makefile.write(f"{last}: ")
-        for dep in graph[last]:
-            makefile.write(f"{dep} ")
-        makefile.write("\n\t@echo \"{last} done.\"\n")
-
-        added = set()
-        print_all_dependences(last, graph, added, makefile)
-
-        makefile.write("clean:\n")
-        makefile.write("\t@echo \"Cleaning up...\"\n")
-        for i in added:
-            makefile.write(f"\trm -f {i}_done\n")
+def read_tasks():
+    tasks = []
+    if os.path.isfile("task_done.txt"):
+        with open("task_done.txt", 'r') as file:
+            tasks = file.read().splitlines()
+    return set(tasks)
 
 
-if __name__ == "__main__":
-    main()
+def write_tasks(tasks):
+    with open("task_done.txt", 'w') as file:
+        file.write('\n'.join(sorted(tasks)))
+
+
+def clear_tasks():
+    if os.path.isfile("task_done.txt"):
+        os.remove("task_done.txt")
+        print("Cleaned completed tasks.")
+    else:
+        print("No tasks to clean.")
+
+
+def read_civgraph():
+    try:
+        with open("civgraph.json", 'r') as file:
+            return json.load(file)
+    except FileNotFoundError:
+        print(f"File civgraph.json not found.")
+        return {}
+
+
+def process_dependencies(graph, start_node):
+    seen = set()
+    ordered_tasks = []
+    done_tasks = read_tasks()
+
+    def traverse(node):
+        if node not in seen and node not in done_tasks:
+            seen.add(node)
+            dependencies = graph.get(node, [])
+            for dep in dependencies:
+                traverse(dep)
+            ordered_tasks.append(node)
+
+    traverse(start_node)
+
+    for task in ordered_tasks:
+        if task not in done_tasks:
+            print(task)
+            done_tasks.add(task)
+
+    write_tasks(done_tasks)
+
+
+if __name__ == '__main__':
+    graph = read_civgraph()
+    user_action = input("Enter action: ").strip().lower()
+
+    if user_action == 'clean':
+        clear_tasks()
+    elif user_action == 'make':
+        target = input("Enter the target technology: ").strip()
+        if target in graph:
+            process_dependencies(graph, target)
+        else:
+            print(f"Target '{target}' not found in the graph.")
+    else:
+        print("Invalid action. Please enter 'make' or 'clean'.")
 ```
-![Без имени](https://github.com/user-attachments/assets/043039ac-3628-424d-88d4-035621e2cc5d)
+![image](https://github.com/user-attachments/assets/00f86098-0c08-432f-8df6-1cf73c132cd9)
+![image](https://github.com/user-attachments/assets/749986a8-4b1c-4bf1-b2b8-a89321d752a9)
+
 
 # Задача 4
 Написать makefile для следующего скрипта сборки:
