@@ -1,12 +1,12 @@
 # Настройки базы данных
 db_host: "localhost"
-db_port: "5432"
+db_port: 5432
 db_name: "my_database"
 db_password: "my_database"
 
 let:
   name: "max_rows"
-  value: "5000"
+  value: 5000
 
 max_rows_per_table: $max_rows$
 

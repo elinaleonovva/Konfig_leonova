@@ -2,6 +2,7 @@ import yaml
 import re
 import argparse
 
+
 def convert_comments_in_line(line):
     """
     Преобразует комментарии в строке YAML (#) в конфигурационный формат (||).
@@ -36,6 +37,8 @@ def convert_value(value, constants):
     """
     Преобразует значение в конфигурацию, включая подстановку констант.
     """
+    if isinstance(value, int):
+        return str(value)
     value = value.strip()
 
     # Подстановка констант по шаблону $имя$
@@ -62,13 +65,12 @@ def process_yaml(yaml_data):
         elif isinstance(value, dict) and 'value' in value and 'name' in value:
             # Обработка объявления констант
             name = sanitize_name(value['name'])
-            constants[name] = value['value']
+            constants[name] = str(value['value'])
             result.append(f'let {name} = {convert_value(value["value"], constants)}')
         elif isinstance(value, list):
             # Обработка массивов
             array_values = ', '.join(convert_value(str(item), constants) for item in value)
             result.append(f'{sanitize_name(key)} = list({array_values})')
-
     return "\n".join(result)
 
 

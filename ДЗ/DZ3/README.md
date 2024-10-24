@@ -37,12 +37,12 @@ python converter.py
 ```
 # Конфигурация веб-сервера
 server_name: "Example.com"
-port: "80"
+port: 80
 root: "/var/www/html"
 
 let:
   name: "max_connections"
-  value: "100"
+  value: 100
 
 timeout: $max_connections$
 
@@ -68,13 +68,13 @@ file = list("config/nginx.conf", "config/default.conf")
 ```
 # Настройки базы данных
 db_host: "localhost"
-db_port: "5432"
+db_port: 5432
 db_name: "my_database"
 db_password: "my_database"
 
 let:
   name: "max_rows"
-  value: "5000"
+  value: 5000
 
 max_rows_per_table: $max_rows$
 

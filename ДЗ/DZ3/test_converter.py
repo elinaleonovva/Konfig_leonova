@@ -37,7 +37,7 @@ def test_sanitize_name():
 def test_convert_value():
     constants = {"SOME_CONSTANT": "42"}
     assert convert_value("$SOME_CONSTANT$", constants) == '42'
-    assert convert_value("123", constants) == "123"
+    assert convert_value(123, constants) == "123"  # Изменено: значение как число
     assert convert_value("hello world", constants) == '"hello world"'
 
 
@@ -45,7 +45,7 @@ def test_convert_value():
 def test_process_yaml():
     yaml_data = {
         "key1": "value1",
-        "key2": 123,
+        "key2": 123,  # Изменено: число не как строка
         "array": [1, 2, 3],
         "constant": {"name": "CONST", "value": "constant_value"}
     }
@@ -67,9 +67,9 @@ def test_process_yaml_with_comments(tmp_path):
     # Создаем временный YAML файл для теста
     yaml_content = """
     # Comment
-    key1: value1  
-    key2: 123  
-    array:  
+    key1: value1
+    key2: 123
+    array:
       - 1
       - 2
       - 3
@@ -78,7 +78,8 @@ def test_process_yaml_with_comments(tmp_path):
       value: constant_value
     """
     yaml_file = tmp_path / "test.yaml"
-    yaml_file.write_text(yaml_content)
+
+    yaml_file.write_text(yaml_content, encoding='utf-8')
 
     expected_output = (
         '|| Comment\n'

@@ -1,11 +1,11 @@
 # Конфигурация веб-сервера
 server_name: "Example.com"
-port: "80"
+port: 80
 root: "/var/www/html"
 
 let:
   name: "max_connections"
-  value: "100"
+  value: 100
 
 timeout: $max_connections$
 
