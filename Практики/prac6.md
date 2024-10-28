@@ -90,13 +90,21 @@ def update_makefile(graph, target_technology):
     completed_tasks = read_completed_tasks()
     dependencies = get_dependencies(graph, target_technology)
     completed_tasks.add(target_technology)
-    
-    with open('Makefile', 'a') as makefile:
+
+    with open('Makefile', 'w') as makefile:
+        all_targets = " ".join(dependencies)
+        makefile.write(f"all: {all_targets}\n\n")
+
         for dependency in dependencies:
             if dependency not in completed_tasks:
                 completed_tasks.add(dependency)
-                makefile.write(f'\t@echo "{dependency} done"\n')
+                required_deps = " ".join(graph.get(dependency, []))
+                makefile.write(f"{dependency}: {required_deps}\n")
+                makefile.write(f'\t@echo "Building {dependency}"\n\n')
 
+        makefile.write(f".PHONY: {all_targets}\n")
+
+    # Обновление файла с завершенными задачами
     write_completed_tasks(completed_tasks)
 
 def read_completed_tasks():
@@ -117,17 +125,14 @@ def clean():
         print("No tasks to clean.")
 
 if __name__ == '__main__':
-    action = input("Enter action: ").strip().lower()
-
-    if action == 'clean':
-        clean()
-    else:
-        with open('civgraph.json') as json_file:
-            dependency_graph = json.load(json_file)
-        target_input = input('Enter the target technology: ')
-        update_makefile(dependency_graph, target_input)
-
+    clean()
+    with open('civgraph.json') as json_file:
+        dependency_graph = json.load(json_file)
+    target_input = input('Enter target: ')
+    update_makefile(dependency_graph, target_input)
+    print("Makefile создан.")
 ```
+![image](https://github.com/user-attachments/assets/efc267d3-a417-489c-9fec-e94e1480081b)
 ![image](https://github.com/user-attachments/assets/46100c55-b390-4c57-a815-b68e520b4ca3)
 
 
