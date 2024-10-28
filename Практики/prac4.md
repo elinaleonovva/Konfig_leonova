@@ -25,3 +25,23 @@ Coder2 добавляет в readme в раздел об авторах свою
 
 # Задача 4
 Написать программу на Питоне (или другом ЯП), которая выводит список содержимого всех объектов репозитория. Воспользоваться командой "git cat-file -p". Идеальное решение – не использовать иных сторонних команд и библиотек для работы с git.
+
+```
+import os
+import subprocess
+
+def main():
+    os.chdir("C:/Users/elina/Desktop/МИРЭА/2 курс/konfig/prac4")
+
+    file_list = subprocess.check_output("dir /b", shell=True).decode("cp866").split()
+    print(f"List of files: {file_list}")
+
+    for file_name in file_list:
+        file_hash = subprocess.check_output(f"git hash-object {file_name}", shell=True).decode("cp866").strip()
+        print(f'{file_name}:\n{subprocess.check_output(f"git cat-file -p {file_hash}", shell=True).decode("cp866")}')
+
+
+if __name__ == "__main__":
+    main()
+```
+![image](https://github.com/user-attachments/assets/ddb2c1a7-a8b5-4616-bdb9-165ecb1a949b)
