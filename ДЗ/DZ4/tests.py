@@ -3,6 +3,7 @@ import pytest
 from assembler import load_constant, memory_read, memory_write, greater_than, assemble
 from interpreter import interpret
 
+
 @pytest.mark.parametrize("command_func, b, expected_a", [
     (load_constant, 256, 30),
     (memory_read, 128, 0),
@@ -13,7 +14,8 @@ def test_commands(command_func, b, expected_a):
     result = command_func(b)
     a_b, result_b = struct.unpack('>BH', result)
     assert a_b >> 3 == expected_a  # Проверка значения 'a' в команде
-    assert result_b == b & 0xFF    # Проверка значения 'b' в команде
+    assert result_b == b & 0xFF  # Проверка значения 'b' в команде
+
 
 def test_assemble(tmp_path):
     input_file = tmp_path / "input.txt"
@@ -38,6 +40,7 @@ def test_assemble(tmp_path):
         assert lines[2] == "A = 8, B = 512\n"
         assert lines[3] == "A = 20, B = 1024\n"
 
+
 def test_interpret(tmp_path):
     binary_file = tmp_path / "output.bin"
     result_file = tmp_path / "result.csv"
@@ -57,6 +60,7 @@ def test_interpret(tmp_path):
         reader = resfile.readlines()
         assert reader[0].strip() == "Address,Value"
         # Проверяем, что память была модифицирована корректно на адресах 0-15
+
 
 if __name__ == "__main__":
     pytest.main()
