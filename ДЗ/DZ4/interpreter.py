@@ -2,33 +2,43 @@ import struct
 import csv
 import argparse
 
-# Инициализация памяти и аккумулятора
+# Инициализация памяти и аккумулятора для хранения временных данных
 MEMORY_SIZE = 1024
 memory = [0] * MEMORY_SIZE
 accumulator = 0
 
 
 def format_byte(byte):
-    # Преобразуем байт в шестнадцатеричную строку с префиксом '0x'
+    """
+    Форматирует байт в шестнадцатеричную строку с префиксом '0x'.
+    """
     return f"0x{byte:02X}"
 
 
-# Декодирование команд из бинарного файла
 def interpret(binary_file, result_file, start, end):
+    """
+    Функция интерпретации команд из бинарного файла.
+
+    Читает команды из файла, выполняет их, и сохраняет значения из заданного диапазона памяти в CSV-файл.
+    """
     with open(binary_file, 'rb') as binfile, open(result_file, 'w', newline='') as resfile:
         result_writer = csv.writer(resfile)
         result_writer.writerow(['Address', 'Value'])
 
+        # Построчное чтение команды из бинарного файла
         while True:
-            command = binfile.read(3)
+            command = binfile.read(3)  # Чтение одной команды (3 байта)
             if not command:
                 break
 
+            # Распаковка команд
             a_b, b = struct.unpack('>BH', command)
             a = a_b >> 3
             b = ((a_b & 0x07) << 8) | b
 
             global accumulator
+
+            # Выполнение команды в зависимости от значения 'a'
             if a == 30:  # LOAD_CONSTANT
                 accumulator = b
             elif a == 0:  # MEMORY_READ
@@ -46,7 +56,6 @@ def interpret(binary_file, result_file, start, end):
                 result_writer.writerow([i, memory[i]])
 
 
-# Настраиваем аргументы командной строки
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Interpreter for virtual machine.")
     parser.add_argument("binary_file", help="Path to the binary input file")

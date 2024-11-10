@@ -2,7 +2,7 @@ import struct
 import argparse
 
 
-# Определяем функции для каждой команды
+# Функции для каждой команды
 def load_constant(b):
     a = 30
     return struct.pack('>BH', (a << 3) | (b >> 8), b & 0xFF)
@@ -23,7 +23,7 @@ def greater_than(b):
     return struct.pack('>BH', (a << 3) | (b >> 8), b & 0xFF)
 
 
-# Допустимые команды
+# Словарь с допустимыми командами и их обработчиками
 VALID_COMMANDS = {
     "LOAD_CONSTANT": load_constant,
     "MEMORY_READ": memory_read,
@@ -32,9 +32,18 @@ VALID_COMMANDS = {
 }
 
 
-# Ассемблерная обработка
 def assemble(input_file, output_file, log_file):
+    """
+    Основная функция ассемблера:
+    Читает команды из текстового файла, преобразует их в машинный код, записывает в бинарный файл и лог.
+
+    Параметры:
+        - input_file: путь к текстовому файлу с командами
+        - output_file: путь к бинарному файлу для записи кода
+        - log_file: путь к CSV-файлу для записи лога выполнения
+    """
     with open(input_file, 'r') as infile, open(output_file, 'wb') as binfile, open(log_file, 'w') as logfile:
+        # Построчная обработка входного файла
         for line_num, line in enumerate(infile, 1):
             line = line.strip()  # Удаление пробелов в начале и конце строки
 
@@ -60,7 +69,7 @@ def assemble(input_file, output_file, log_file):
                 print("Перезапишите данные в файле корректно.")
                 return
 
-            # Проверка, является ли b числом
+            # Проверка, является ли 'b' целым числом
             try:
                 b = int(b_value)
             except ValueError:
@@ -68,7 +77,7 @@ def assemble(input_file, output_file, log_file):
                 print("Пожалуйста, перезапишите данные в файле на корректные.")
                 return
 
-            # Получаем функцию команды и формируем код
+            # Получаем функцию команды и формируем машинный код
             command_func = VALID_COMMANDS[command]
             code = command_func(b)
 
@@ -78,7 +87,6 @@ def assemble(input_file, output_file, log_file):
             binfile.write(code)
 
 
-# Настраиваем аргументы командной строки
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Assembler for virtual machine.")
     parser.add_argument("input_file", help="Path to the input file with text program")

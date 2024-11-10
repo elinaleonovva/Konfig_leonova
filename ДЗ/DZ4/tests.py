@@ -13,8 +13,8 @@ from interpreter import interpret
 def test_commands(command_func, b, expected_a):
     result = command_func(b)
     a_b, result_b = struct.unpack('>BH', result)
-    assert a_b >> 3 == expected_a  # Проверка значения 'a' в команде
-    assert result_b == b & 0xFF  # Проверка значения 'b' в команде
+    assert a_b >> 3 == expected_a
+    assert result_b == b & 0xFF
 
 
 def test_assemble_correct_input(tmp_path):
