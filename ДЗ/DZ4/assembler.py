@@ -23,33 +23,58 @@ def greater_than(b):
     return struct.pack('>BH', (a << 3) | (b >> 8), b & 0xFF)
 
 
+# Допустимые команды
+VALID_COMMANDS = {
+    "LOAD_CONSTANT": load_constant,
+    "MEMORY_READ": memory_read,
+    "MEMORY_WRITE": memory_write,
+    "GREATER_THAN": greater_than,
+}
+
+
 # Ассемблерная обработка
 def assemble(input_file, output_file, log_file):
     with open(input_file, 'r') as infile, open(output_file, 'wb') as binfile, open(log_file, 'w') as logfile:
-        for line in infile:
+        for line_num, line in enumerate(infile, 1):
             line = line.strip()  # Удаление пробелов в начале и конце строки
+
             if not line:  # Пропуск пустых строк
                 continue
+
             parts = line.split()
+
+            # Проверка количества аргументов
+            if len(parts) != 2:
+                print(f"Ошибка в строке {line_num}: неверное количество аргументов. "
+                      f"Ожидалось 2, найдено {len(parts)}.")
+                print("Пожалуйста, перезапишите данные в файле на корректные.")
+                return
+
             command = parts[0]
-            if command == "LOAD_CONSTANT":
-                b = int(parts[1])
-                code = load_constant(b)
-                logfile.write(f"A = 30, B = {b}\n")
-            elif command == "MEMORY_READ":
-                b = int(parts[1])
-                code = memory_read(b)
-                logfile.write(f"A = 0, B = {b}\n")
-            elif command == "MEMORY_WRITE":
-                b = int(parts[1])
-                code = memory_write(b)
-                logfile.write(f"A = 8, B = {b}\n")
-            elif command == "GREATER_THAN":
-                b = int(parts[1])
-                code = greater_than(b)
-                logfile.write(f"A = 20, B = {b}\n")
-            else:
-                continue
+            b_value = parts[1]
+
+            # Проверка допустимости команды
+            if command not in VALID_COMMANDS:
+                print(f"Ошибка в строке {line_num}: недопустимая команда '{command}'.")
+                print("Пожалуйста, используйте одну из следующих команд:", ", ".join(VALID_COMMANDS.keys()))
+                print("Перезапишите данные в файле корректно.")
+                return
+
+            # Проверка, является ли b числом
+            try:
+                b = int(b_value)
+            except ValueError:
+                print(f"Ошибка в строке {line_num}: '{b_value}' не является целым числом.")
+                print("Пожалуйста, перезапишите данные в файле на корректные.")
+                return
+
+            # Получаем функцию команды и формируем код
+            command_func = VALID_COMMANDS[command]
+            code = command_func(b)
+
+            # Запись данных в лог и бинарный файл
+            a_value = (code[0] >> 3)  # Извлекаем значение 'a' из кода команды
+            logfile.write(f"A = {a_value}, B = {b}\n")
             binfile.write(code)
 
 

@@ -17,11 +17,12 @@ def test_commands(command_func, b, expected_a):
     assert result_b == b & 0xFF  # Проверка значения 'b' в команде
 
 
-def test_assemble(tmp_path):
+def test_assemble_correct_input(tmp_path):
     input_file = tmp_path / "input.txt"
     output_file = tmp_path / "output.bin"
     log_file = tmp_path / "log.csv"
 
+    # Корректные данные
     input_file.write_text("LOAD_CONSTANT 256\nMEMORY_READ 128\nMEMORY_WRITE 512\nGREATER_THAN 1024\n")
     assemble(str(input_file), str(output_file), str(log_file))
 
@@ -39,6 +40,25 @@ def test_assemble(tmp_path):
         assert lines[1] == "A = 0, B = 128\n"
         assert lines[2] == "A = 8, B = 512\n"
         assert lines[3] == "A = 20, B = 1024\n"
+
+
+@pytest.mark.parametrize("input_text, expected_error_message", [
+    ("INVALID_COMMAND 123\n", "Ошибка в строке 1: недопустимая команда 'INVALID_COMMAND'."),
+    ("LOAD_CONSTANT\n", "Ошибка в строке 1: неверное количество аргументов. Ожидалось 2, найдено 1."),
+    ("LOAD_CONSTANT abc\n", "Ошибка в строке 1: 'abc' не является целым числом."),
+])
+def test_assemble_invalid_input(tmp_path, capsys, input_text, expected_error_message):
+    input_file = tmp_path / "input.txt"
+    output_file = tmp_path / "output.bin"
+    log_file = tmp_path / "log.csv"
+
+    # Запись некорректных данных
+    input_file.write_text(input_text)
+
+    # Проверка, что выполнение завершается с сообщением об ошибке
+    assemble(str(input_file), str(output_file), str(log_file))
+    captured = capsys.readouterr()
+    assert expected_error_message in captured.out
 
 
 def test_interpret(tmp_path):
