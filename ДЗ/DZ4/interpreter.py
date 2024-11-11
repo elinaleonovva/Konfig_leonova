@@ -33,8 +33,8 @@ def interpret(binary_file, result_file, start, end):
 
             # Распаковка команд
             a_b, b = struct.unpack('>BH', command)
-            a = a_b >> 3
-            b = ((a_b & 0x07) << 8) | b
+            a = a_b % int("100000", 2)
+            b = (b >> 5) + (a_b // int("100000", 2))
 
             global accumulator
 

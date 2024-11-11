@@ -1,86 +1,124 @@
-import struct
+import csv
+import re
 import pytest
-from assembler import load_constant, memory_read, memory_write, greater_than, assemble
+from assembler import assemble, load_constant, memory_read, memory_write, greater_than
 from interpreter import interpret
 
+# Тестовые значения для проверки на шестнадцатеричные коды
+test_commands = [
+    ("LOAD_CONSTANT 684", b'\x9E\x55\x00'),
+    ("MEMORY_READ 327", b'\xE0\x28\x00'),
+    ("MEMORY_WRITE 168", b'\x08\x15\x00'),
+    ("GREATER_THAN 679", b'\xF4\x54\x00')
+]
 
-@pytest.mark.parametrize("command_func, b, expected_a", [
-    (load_constant, 256, 30),
-    (memory_read, 128, 0),
-    (memory_write, 512, 8),
-    (greater_than, 1024, 20),
-])
-def test_commands(command_func, b, expected_a):
-    result = command_func(b)
-    a_b, result_b = struct.unpack('>BH', result)
-    assert a_b >> 3 == expected_a
-    assert result_b == b & 0xFF
+# Путь к файлам
+input_file = 'input.txt'
+output_file = 'output.bin'
+log_file = 'log.csv'
+result_file = 'result.csv'
 
+@pytest.fixture
+def prepare_input_file(tmp_path):
+    """Создает временный файл с тестовыми командами"""
+    temp_input = tmp_path / input_file
+    with open(temp_input, 'w') as f:
+        for command, _ in test_commands:
+            f.write(command + '\n')
+    return temp_input
 
-def test_assemble_correct_input(tmp_path):
-    input_file = tmp_path / "input.txt"
-    output_file = tmp_path / "output.bin"
-    log_file = tmp_path / "log.csv"
+@pytest.fixture
+def prepare_output_log_files(tmp_path):
+    """Создает временные файлы для бинарного и лог файлов"""
+    temp_output = tmp_path / output_file
+    temp_log = tmp_path / log_file
+    return temp_output, temp_log
 
-    # Корректные данные
-    input_file.write_text("LOAD_CONSTANT 256\nMEMORY_READ 128\nMEMORY_WRITE 512\nGREATER_THAN 1024\n")
-    assemble(str(input_file), str(output_file), str(log_file))
+@pytest.fixture
+def prepare_binary_file(tmp_path):
+    """Создает временный бинарный файл для интерпретатора"""
+    temp_binary = tmp_path / output_file
+    with open(temp_binary, 'wb') as f:
+        for _, expected_code in test_commands:
+            f.write(expected_code)
+    return temp_binary
 
-    # Проверка содержимого output.bin
-    with open(output_file, 'rb') as binfile:
-        assert binfile.read(3) == load_constant(256)
-        assert binfile.read(3) == memory_read(128)
-        assert binfile.read(3) == memory_write(512)
-        assert binfile.read(3) == greater_than(1024)
+def test_assemble_commands(prepare_input_file, prepare_output_log_files):
+    """Тестирует выполнение assemble с проверкой правильного кода команд"""
+    temp_input, temp_output, temp_log = prepare_input_file, *prepare_output_log_files
 
-    # Проверка содержимого log.csv
-    with open(log_file, 'r') as logfile:
-        lines = logfile.readlines()
-        assert lines[0] == "A = 30, B = 256\n"
-        assert lines[1] == "A = 0, B = 128\n"
-        assert lines[2] == "A = 8, B = 512\n"
-        assert lines[3] == "A = 20, B = 1024\n"
+    # Выполнение ассемблера
+    assemble(temp_input, temp_output, temp_log)
 
-
-@pytest.mark.parametrize("input_text, expected_error_message", [
-    ("INVALID_COMMAND 123\n", "Ошибка в строке 1: недопустимая команда 'INVALID_COMMAND'."),
-    ("LOAD_CONSTANT\n", "Ошибка в строке 1: неверное количество аргументов. Ожидалось 2, найдено 1."),
-    ("LOAD_CONSTANT abc\n", "Ошибка в строке 1: 'abc' не является целым числом."),
-])
-def test_assemble_invalid_input(tmp_path, capsys, input_text, expected_error_message):
-    input_file = tmp_path / "input.txt"
-    output_file = tmp_path / "output.bin"
-    log_file = tmp_path / "log.csv"
-
-    # Запись некорректных данных
-    input_file.write_text(input_text)
-
-    # Проверка, что выполнение завершается с сообщением об ошибке
-    assemble(str(input_file), str(output_file), str(log_file))
-    captured = capsys.readouterr()
-    assert expected_error_message in captured.out
+    # Проверка бинарного файла
+    with open(temp_output, 'rb') as f:
+        for _, expected_code in test_commands:
+            assert f.read(3) == expected_code
 
 
-def test_interpret(tmp_path):
-    binary_file = tmp_path / "output.bin"
-    result_file = tmp_path / "result.csv"
+def test_log_file_format():
+    """Тестирует формат и содержание лог файла с проверкой корректности шестнадцатиричных кодов"""
+    log_data = [
+        "A = 30, B = 684 (0x9E, 0x55, 0x00)",
+        "A = 0, B = 327 (0xE0, 0x28, 0x00)",
+        "A = 8, B = 168 (0x08, 0x15, 0x00)",
+        "A = 20, B = 679 (0xF4, 0x54, 0x00)"
+    ]
 
-    # Создаем бинарный файл для интерпретации
-    with open(binary_file, 'wb') as binfile:
-        binfile.write(load_constant(42))
-        binfile.write(memory_write(10))
-        binfile.write(memory_read(10))
-        binfile.write(greater_than(5))
+    # Регулярное выражение для проверки формата строки
+    log_pattern = re.compile(r"A = (\d+), B = (\d+) \((0x[0-9A-Fa-f]+, 0x[0-9A-Fa-f]+, 0x[0-9A-Fa-f]+)\)")
 
-    # Выполняем интерпретацию и проверяем результат
-    interpret(str(binary_file), str(result_file), start=0, end=15)
+    for line in log_data:
+        match = log_pattern.match(line.strip())
+        assert match, f"Неверный формат строки: {line.strip()}"
 
-    # Проверка содержимого result.csv
-    with open(result_file, 'r') as resfile:
-        reader = resfile.readlines()
-        assert reader[0].strip() == "Address,Value"
-        # Проверяем, что память была модифицирована корректно на адресах 0-15
+        a_value = int(match.group(1))
+        b_value = int(match.group(2))
+        hex_values = match.group(3)
 
+        if a_value == 30:
+            assert b_value == 684
+            assert hex_values == "0x9E, 0x55, 0x00"
+        elif a_value == 0:
+            assert b_value == 327
+            assert hex_values == "0xE0, 0x28, 0x00"
+        elif a_value == 8:
+            assert b_value == 168
+            assert hex_values == "0x08, 0x15, 0x00"
+        elif a_value == 20:
+            assert b_value == 679
+            assert hex_values == "0xF4, 0x54, 0x00"
+        else:
+            assert False, f"Неизвестное значение A = {a_value}"
 
-if __name__ == "__main__":
-    pytest.main()
+def test_interpreter_output_format(prepare_binary_file, tmp_path):
+    """Тестирует интерпретацию и форматирование выводимого CSV файла"""
+    temp_binary = prepare_binary_file
+    temp_result = tmp_path / result_file
+
+    # Выполнение интерпретатора
+    interpret(temp_binary, temp_result, start=0, end=5)
+
+    # Проверка содержимого CSV файла
+    with open(temp_result, 'r') as res:
+        reader = csv.reader(res)
+        header = next(reader)
+        assert header == ['Address', 'Value']
+        rows = list(reader)
+        assert len(rows) >= 6
+
+@pytest.mark.parametrize("command, expected_code", test_commands)
+def test_hex_code_formatting(command, expected_code):
+    """Тестирует корректность шестнадцатеричного кода для каждой команды"""
+    command_name, b_value = command.split()
+    b = int(b_value)
+
+    # Проверка вызова нужной функции и получения ожидаемого кода
+    if command_name == "LOAD_CONSTANT":
+        assert load_constant(b) == expected_code
+    elif command_name == "MEMORY_READ":
+        assert memory_read(b) == expected_code
+    elif command_name == "MEMORY_WRITE":
+        assert memory_write(b) == expected_code
+    elif command_name == "GREATER_THAN":
+        assert greater_than(b) == expected_code

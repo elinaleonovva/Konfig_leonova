@@ -2,25 +2,32 @@ import struct
 import argparse
 
 
+def format_byte(byte):
+    """
+    Форматирует байт в шестнадцатеричную строку с префиксом '0x'.
+    """
+    return f"0x{byte:02X}"
+
+
 # Функции для каждой команды
 def load_constant(b):
     a = 30
-    return struct.pack('>BH', (a << 3) | (b >> 8), b & 0xFF)
+    return struct.pack('>BH', (a | (b << 5)) & 0xFF, (b << 5) & 0xFFFF00)
 
 
 def memory_read(b):
     a = 0
-    return struct.pack('>BH', (a << 3) | (b >> 8), b & 0xFF)
+    return struct.pack('>BH', (a | (b << 5)) & 0xFF, (b << 5) & 0xFFFF00)
 
 
 def memory_write(b):
     a = 8
-    return struct.pack('>BH', (a << 3) | (b >> 8), b & 0xFF)
+    return struct.pack('>BH', (a | (b << 5)) & 0xFF, (b << 5) & 0xFFFF00)
 
 
 def greater_than(b):
     a = 20
-    return struct.pack('>BH', (a << 3) | (b >> 8), b & 0xFF)
+    return struct.pack('>BH', (a | (b << 5)) & 0xFF, (b << 5) & 0xFFFF00)
 
 
 # Словарь с допустимыми командами и их обработчиками
@@ -82,8 +89,8 @@ def assemble(input_file, output_file, log_file):
             code = command_func(b)
 
             # Запись данных в лог и бинарный файл
-            a_value = (code[0] >> 3)  # Извлекаем значение 'a' из кода команды
-            logfile.write(f"A = {a_value}, B = {b}\n")
+            a_value = code[0] % int("100000", 2)
+            logfile.write(f"A = {a_value}, B = {b} ({format_byte(code[0])}, {format_byte(code[1])}, {format_byte(code[2])})\n")
             binfile.write(code)
 
 
