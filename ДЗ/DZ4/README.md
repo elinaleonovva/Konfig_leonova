@@ -113,4 +113,5 @@ pytest -v tests.py
 ```
 
 ## Результаты тестирования
-![image](https://github.com/user-attachments/assets/3f1bed72-313e-40f9-88ce-e7a7c1420a85)
+![image](https://github.com/user-attachments/assets/65dcb3fa-e5fb-4ba4-b45d-1e377ab96fa8)
+
