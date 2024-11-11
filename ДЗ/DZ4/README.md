@@ -81,8 +81,8 @@
 
 ## Клонирование репозитория
 ```
-git clone <URL репозитория>
-cd <директория проекта>
+git clone https://github.com/elinaleonovva/Konfig_leonova.git
+cd Konfig_leonova/ДЗ/DZ4
 ```
 
 ## Запуск программ
