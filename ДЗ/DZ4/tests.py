@@ -18,6 +18,7 @@ output_file = 'output.bin'
 log_file = 'log.csv'
 result_file = 'result.csv'
 
+
 @pytest.fixture
 def prepare_input_file(tmp_path):
     """Создает временный файл с тестовыми командами"""
@@ -27,12 +28,14 @@ def prepare_input_file(tmp_path):
             f.write(command + '\n')
     return temp_input
 
+
 @pytest.fixture
 def prepare_output_log_files(tmp_path):
     """Создает временные файлы для бинарного и лог файлов"""
     temp_output = tmp_path / output_file
     temp_log = tmp_path / log_file
     return temp_output, temp_log
+
 
 @pytest.fixture
 def prepare_binary_file(tmp_path):
@@ -42,6 +45,7 @@ def prepare_binary_file(tmp_path):
         for _, expected_code in test_commands:
             f.write(expected_code)
     return temp_binary
+
 
 def test_assemble_commands(prepare_input_file, prepare_output_log_files):
     """Тестирует выполнение assemble с проверкой правильного кода команд"""
@@ -57,7 +61,7 @@ def test_assemble_commands(prepare_input_file, prepare_output_log_files):
 
 
 def test_log_file_format():
-    """Тестирует формат и содержание лог файла с проверкой корректности шестнадцатиричных кодов"""
+    """Тестирует формат и содержание лог файла"""
     log_data = [
         "A = 30, B = 684 (0x9E, 0x55, 0x00)",
         "A = 0, B = 327 (0xE0, 0x28, 0x00)",
@@ -91,6 +95,7 @@ def test_log_file_format():
         else:
             assert False, f"Неизвестное значение A = {a_value}"
 
+
 def test_interpreter_output_format(prepare_binary_file, tmp_path):
     """Тестирует интерпретацию и форматирование выводимого CSV файла"""
     temp_binary = prepare_binary_file
@@ -107,13 +112,13 @@ def test_interpreter_output_format(prepare_binary_file, tmp_path):
         rows = list(reader)
         assert len(rows) >= 6
 
+
 @pytest.mark.parametrize("command, expected_code", test_commands)
 def test_hex_code_formatting(command, expected_code):
     """Тестирует корректность шестнадцатеричного кода для каждой команды"""
     command_name, b_value = command.split()
     b = int(b_value)
 
-    # Проверка вызова нужной функции и получения ожидаемого кода
     if command_name == "LOAD_CONSTANT":
         assert load_constant(b) == expected_code
     elif command_name == "MEMORY_READ":
